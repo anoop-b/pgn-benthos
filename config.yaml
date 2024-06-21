@@ -1,0 +1,29 @@
+http:
+  enabled: true
+  address: 0.0.0.0:4195
+# Instead of newlines, use a custom delimiter:
+input:
+  file:
+    paths: [ "data/*.pgn" ]     
+    scanner:
+      lines:
+        custom_delimiter: "[Event"
+        max_buffer_size: 500_000_000 # 500MB line bufferbuffer:
+
+pipeline:
+  threads: -1
+  processors:
+    -  bloblang: |
+        "[Event" + content()
+      
+output:
+  label: "nats"
+  nats_jetstream:
+    urls:
+      - nats://0.0.0.0:4222
+    subject: CHESS.GAMES
+
+shutdown_delay: 0s
+shutdown_timeout: 0s
+
+
